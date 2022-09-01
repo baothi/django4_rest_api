@@ -1,31 +1,27 @@
 from rest_framework import serializers
-from watchlist_app.models import Movie
+from watchlist_app.models import WatchList, StreamPlatform
 
 # https://github.com/encode/django-rest-framework/blob/master/rest_framework/serializers.py
-class MovieSerializer(serializers.ModelSerializer):
-    # https://www.django-rest-framework.org/api-guide/fields/#serializermethodfield
-    len_name = serializers.SerializerMethodField()
+class WatchListSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = Movie
+        model = WatchList
         fields = "__all__"
-        # fields = ['id', 'name', 'description']
-        # exclude = ["active"]
     
-    def validate(self, data):
-        if data['name'] == data['description']:
-            raise serializers.ValidationError("Title and Description should be different!")
-        else:
-            return data
     
-    def get_len_name(self, objects):
-        return len(objects.name)
+# HyperlinkedModelSerializer = https://www.django-rest-framework.org/api-guide/serializers/#hyperlinkedmodelserializer    
+class StreamPlatformSerializer(serializers.HyperlinkedModelSerializer):
+# class StreamPlatformSerializer(serializers.ModelSerializer):
+    # watchlist = WatchListSerializer(many=True, read_only=True)
+    #watchlist = serializers.StringRelatedField(many=True)
     
-    def validate_name(self, value):
-        if len(value) < 2:
-            raise serializers.ValidationError("Name is too short!")
-        else:
-            return value
+    # https://www.django-rest-framework.org/api-guide/relations/#hyperlinkedrelatedfield
+    # movie-detail = urls.py path('<int:pk>', WatchDetailAV.as_view(), name='movie-detail'),
+    watchlist = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name="movie-detail")
+
+    class Meta:
+        model = StreamPlatform
+        fields = "__all__"
 
 
 # # https://www.django-rest-framework.org/api-guide/serializers/#validators
