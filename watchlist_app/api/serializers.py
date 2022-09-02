@@ -12,12 +12,12 @@ class WatchListSerializer(serializers.ModelSerializer):
 # HyperlinkedModelSerializer = https://www.django-rest-framework.org/api-guide/serializers/#hyperlinkedmodelserializer    
 class StreamPlatformSerializer(serializers.HyperlinkedModelSerializer):
 # class StreamPlatformSerializer(serializers.ModelSerializer):
-    # watchlist = WatchListSerializer(many=True, read_only=True)
+    watchlist = WatchListSerializer(many=True, read_only=True)
     #watchlist = serializers.StringRelatedField(many=True)
     
     # https://www.django-rest-framework.org/api-guide/relations/#hyperlinkedrelatedfield
-    # movie-detail = urls.py path('<int:pk>', WatchDetailAV.as_view(), name='movie-detail'),
-    watchlist = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name="movie-detail")
+    # watch-detail = urls.py path('<int:pk>', WatchDetailAV.as_view(), name='watch-detail'),
+    # watchlist = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name="watch-detail")
 
     class Meta:
         model = StreamPlatform
