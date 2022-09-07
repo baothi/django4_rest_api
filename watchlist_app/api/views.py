@@ -1,6 +1,12 @@
 import re
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 # from rest_framework.decorators import api_view
+
+# https://www.django-rest-framework.org/api-guide/permissions/#object-level-permissions
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
+
+from watchlist_app.api.permissions import IsAdminOrReadOnly, IsReviewUserOrReadOnly
 
 # https://www.django-rest-framework.org/api-guide/status-codes/
 from rest_framework import status
@@ -20,34 +26,41 @@ class ReviewCreate(generics.CreateAPIView):
     # permission_classes = [IsAuthenticated]
     # throttle_classes = [ReviewCreateThrottle]
 
-    # def get_queryset(self):
-    #     return Review.objects.all()
+    def get_queryset(self):
+        return Review.objects.all()
 
     def perform_create(self, serializer):
         pk = self.kwargs.get('pk')
         watchlist = WatchList.objects.get(pk=pk)
         
-        # review_queryset = Review.objects.filter(watchlist=watchlist)
+        review_user = self.request.user
+        review_queryset = Review.objects.filter(watchlist=watchlist, review_user=review_user)
 
-        # if review_queryset.exists():
-        #     raise ValidationError("You have already reviewed this movie!")
+        if review_queryset.exists():
+            raise ValidationError("You have already reviewed this movie!")
 
-        # if watchlist.number_rating == 0:
-        #     watchlist.avg_rating = serializer.validated_data['rating']
-        # else:
-        #     watchlist.avg_rating = (watchlist.avg_rating + serializer.validated_data['rating'])/2
+        if watchlist.number_rating == 0:
+            watchlist.avg_rating = serializer.validated_data['rating']
+        else:
+            watchlist.avg_rating = (watchlist.avg_rating + serializer.validated_data['rating'])/2
 
-        # watchlist.number_rating = watchlist.number_rating + 1
-        # watchlist.save()
+        watchlist.number_rating = watchlist.number_rating + 1
+        watchlist.save()
 
-        serializer.save(watchlist=watchlist)
+        serializer.save(watchlist=watchlist, review_user = review_user)
+
+
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS
 
 # https://www.django-rest-framework.org/tutorial/3-class-based-views/#using-generic-class-based-views
 # https://github.com/encode/django-rest-framework/blob/master/rest_framework/generics.py
 class ReviewList(generics.ListCreateAPIView):
     # queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated|ReadOnly]
+    # permission_classes = [IsAdminOrReadOnly]
     # throttle_classes = [ReviewListThrottle, AnonRateThrottle]
     # filter_backends = [DjangoFilterBackend]
     # filterset_fields = ['review_user__username', 'active']
@@ -57,13 +70,19 @@ class ReviewList(generics.ListCreateAPIView):
         return Review.objects.filter(watchlist=pk)
 
 
-
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS
 
 # http://localhost:8000/watch/stream/4
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    # permission_classes = [IsReviewUserOrReadOnly]
+    # permission_classes = [IsAuthenticated|ReadOnly]
+    # permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsReviewUserOrReadOnly]
+    
+    
     # throttle_classes = [ScopedRateThrottle, AnonRateThrottle]
     # throttle_scope = 'review-detail'
 
