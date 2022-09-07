@@ -7,8 +7,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        # exclude = ('watchlist',)
-        fields = "__all__"
+        exclude = ('watchlist',)
+        # fields = "__all__"
 
 # https://github.com/encode/django-rest-framework/blob/master/rest_framework/serializers.py
 class WatchListSerializer(serializers.ModelSerializer):
@@ -20,8 +20,8 @@ class WatchListSerializer(serializers.ModelSerializer):
     
     
 # HyperlinkedModelSerializer = https://www.django-rest-framework.org/api-guide/serializers/#hyperlinkedmodelserializer    
-class StreamPlatformSerializer(serializers.HyperlinkedModelSerializer):
-# class StreamPlatformSerializer(serializers.ModelSerializer):
+# class StreamPlatformSerializer(serializers.HyperlinkedModelSerializer):
+class StreamPlatformSerializer(serializers.ModelSerializer):
     watchlist = WatchListSerializer(many=True, read_only=True)
     #watchlist = serializers.StringRelatedField(many=True)
     

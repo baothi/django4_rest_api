@@ -6,31 +6,117 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from rest_framework.views import APIView
-from rest_framework import mixins
+# from rest_framework import mixins
 from rest_framework import generics
+from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 from watchlist_app.models import WatchList, StreamPlatform, Review
 from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializer,ReviewSerializer
+
+# https://www.django-rest-framework.org/api-guide/generic-views/#createapiview
+# http://localhost:8000/watch/stream/1/review-create/
+class ReviewCreate(generics.CreateAPIView):
+    serializer_class = ReviewSerializer
+    # permission_classes = [IsAuthenticated]
+    # throttle_classes = [ReviewCreateThrottle]
+
+    # def get_queryset(self):
+    #     return Review.objects.all()
+
+    def perform_create(self, serializer):
+        pk = self.kwargs.get('pk')
+        watchlist = WatchList.objects.get(pk=pk)
+        
+        # review_queryset = Review.objects.filter(watchlist=watchlist)
+
+        # if review_queryset.exists():
+        #     raise ValidationError("You have already reviewed this movie!")
+
+        # if watchlist.number_rating == 0:
+        #     watchlist.avg_rating = serializer.validated_data['rating']
+        # else:
+        #     watchlist.avg_rating = (watchlist.avg_rating + serializer.validated_data['rating'])/2
+
+        # watchlist.number_rating = watchlist.number_rating + 1
+        # watchlist.save()
+
+        serializer.save(watchlist=watchlist)
+
+# https://www.django-rest-framework.org/tutorial/3-class-based-views/#using-generic-class-based-views
+# https://github.com/encode/django-rest-framework/blob/master/rest_framework/generics.py
+class ReviewList(generics.ListCreateAPIView):
+    # queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    # permission_classes = [IsAuthenticated]
+    # throttle_classes = [ReviewListThrottle, AnonRateThrottle]
+    # filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ['review_user__username', 'active']
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        return Review.objects.filter(watchlist=pk)
+
+
+
+
+# http://localhost:8000/watch/stream/4
+class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    # permission_classes = [IsReviewUserOrReadOnly]
+    # throttle_classes = [ScopedRateThrottle, AnonRateThrottle]
+    # throttle_scope = 'review-detail'
+
 
 
 
 # https://www.django-rest-framework.org/tutorial/3-class-based-views/#using-mixins
-class ReviewDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+# class ReviewDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
+#     queryset = Review.objects.all()
+#     serializer_class = ReviewSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
 
-class ReviewList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+# class ReviewList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+#     queryset = Review.objects.all()
+#     serializer_class = ReviewSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
 
+class StreamPlatformVS(viewsets.ModelViewSet):
+    queryset = StreamPlatform.objects.all()
+    serializer_class = StreamPlatformSerializer
+    
+
+
+
+# https://www.django-rest-framework.org/api-guide/viewsets/
+# class StreamPlatformVS(viewsets.ViewSet):
+
+#     def list(self, request):
+#         queryset = StreamPlatform.objects.all()
+#         serializer = StreamPlatformSerializer(queryset, many=True)
+#         return Response(serializer.data)
+
+#     def retrieve(self, request, pk=None):
+#         queryset = StreamPlatform.objects.all()
+#         watchlist = get_object_or_404(queryset, pk=pk)
+#         serializer = StreamPlatformSerializer(watchlist)
+#         return Response(serializer.data)
+
+#     def create(self, request):
+#         serializer = StreamPlatformSerializer(data=request.data)
+#         # print ("serializer created for django4_rest_api project." , serializer)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         else:
+#             return Response(serializer.errors)
 
 
 class StreamPlatformAV(APIView):
