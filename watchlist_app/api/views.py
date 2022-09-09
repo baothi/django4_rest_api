@@ -59,7 +59,7 @@ class ReadOnly(BasePermission):
 class ReviewList(generics.ListCreateAPIView):
     # queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated|ReadOnly]
+    permission_classes = [IsAuthenticated]
     # permission_classes = [IsAdminOrReadOnly]
     # throttle_classes = [ReviewListThrottle, AnonRateThrottle]
     # filter_backends = [DjangoFilterBackend]
