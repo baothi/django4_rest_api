@@ -23,7 +23,7 @@ from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSer
 # http://localhost:8000/watch/stream/1/review-create/
 class ReviewCreate(generics.CreateAPIView):
     serializer_class = ReviewSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     # throttle_classes = [ReviewCreateThrottle]
 
     def get_queryset(self):
