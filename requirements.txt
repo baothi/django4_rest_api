@@ -24,3 +24,4 @@ django-rest-framework==0.1.0
 django-session-security==2.6.1
 django-session-timeout==0.1.0
 django-summernote
+djangorestframework-simplejwt==5.2.0

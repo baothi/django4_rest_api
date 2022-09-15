@@ -110,6 +110,7 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
 class StreamPlatformVS(viewsets.ModelViewSet):
     queryset = StreamPlatform.objects.all()
     serializer_class = StreamPlatformSerializer
+    permission_classes = [IsAdminOrReadOnly]
     
 
 
@@ -158,7 +159,7 @@ class StreamPlatformAV(APIView):
 
 
 class StreamPlatformDetailAV(APIView):
-    # permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     # throttle_classes = [AnonRateThrottle]
 
     def get(self, request, pk):
@@ -187,7 +188,7 @@ class StreamPlatformDetailAV(APIView):
 
 
 class WatchListAV(APIView):
-    
+    permission_classes = [IsAdminOrReadOnly]
     # https://www.django-rest-framework.org/api-guide/views/
     def get(self, request):
         movies = WatchList.objects.all()
@@ -204,6 +205,7 @@ class WatchListAV(APIView):
             return Response(serializer.errors)
 
 class WatchDetailAV(APIView):
+    permission_classes = [IsAdminOrReadOnly]
     
     def get(self, request, pk): 
         try:

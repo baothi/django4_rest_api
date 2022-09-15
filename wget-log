@@ -1,0 +1,11 @@
+--2022-09-15 14:14:01--  https://raw.githubusercontent.com/angristan/wireguard-install/master/wireguard-install.sh
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.108.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.108.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 15554 (15K) [text/plain]
+Saving to: ‘wireguard-install.sh.2’
+
+wireguard-install.sh.2          0%[                                               ]       0  --.-KB/s               wireguard-install.sh.2        100%[==============================================>]  15.19K  --.-KB/s    in 0.004s  
+
+2022-09-15 14:14:01 (4.14 MB/s) - ‘wireguard-install.sh.2’ saved [15554/15554]
+
