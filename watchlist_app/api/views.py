@@ -11,6 +11,8 @@ from watchlist_app.api.permissions import IsAdminOrReadOnly, IsReviewUserOrReadO
 # https://www.django-rest-framework.org/api-guide/throttling/
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle, ScopedRateThrottle
 from watchlist_app.api.throttling import ReviewCreateThrottle,ReviewListThrottle,ReviewDetailThrottle
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 # https://www.django-rest-framework.org/api-guide/status-codes/
 from rest_framework import status
@@ -22,6 +24,16 @@ from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from watchlist_app.models import WatchList, StreamPlatform, Review
 from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializer,ReviewSerializer
+from watchlist_app.api.pagination import WatchListPagination, WatchListLOPagination, WatchListCPagination
+
+
+# https://django-filter.readthedocs.io/en/stable/
+class UserReview(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    def get_queryset(self):
+        username = self.request.query_params.get('username', None)
+        return Review.objects.filter(review_user__username=username)
+
 
 # https://www.django-rest-framework.org/api-guide/generic-views/#createapiview
 # http://localhost:8000/watch/stream/1/review-create/
@@ -60,14 +72,14 @@ class ReadOnly(BasePermission):
 
 # https://www.django-rest-framework.org/tutorial/3-class-based-views/#using-generic-class-based-views
 # https://github.com/encode/django-rest-framework/blob/master/rest_framework/generics.py
-class ReviewList(generics.ListCreateAPIView):
+class ReviewList(generics.ListAPIView):
     # queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
     # permission_classes = [IsAdminOrReadOnly]
     throttle_classes = [ReviewListThrottle, AnonRateThrottle]
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_fields = ['review_user__username', 'active']
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['review_user__username', 'active']
 
     def get_queryset(self):
         pk = self.kwargs['pk']
@@ -189,6 +201,22 @@ class StreamPlatformDetailAV(APIView):
         platform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class WatchList(generics.ListAPIView):
+    queryset = WatchList.objects.all()
+    print("WatchList view created")
+    serializer_class = WatchListSerializer
+    
+    
+    # filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ['title', 'platform__name']
+    
+    # filter_backends = [filters.SearchFilter]
+    # search_fields = ['title', 'platform__name']
+    
+    # filter_backends = [filters.OrderingFilter]
+    # ordering_fields = ['avg_rating']
+    pagination_class = WatchListCPagination
 
 class WatchListAV(APIView):
     permission_classes = [IsAdminOrReadOnly]

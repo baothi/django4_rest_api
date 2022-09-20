@@ -16,7 +16,7 @@ services:
   #     discovery.type: single-node
   #     network.host: "0.0.0.0"
   #     bootstrap.memory_lock: "true"
-  db:
+  dokku-postgres-django4-rest-api:
     container_name: postgres
     image: postgres
     ports:
@@ -26,7 +26,7 @@ services:
     environment:
       POSTGRES_DB: django4_rest_api
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: c3d315e1da12cea4636812b060f135dc
       POSTGRES_PORT: 5432
       DATABASE_HOST: 127.0.0.1
     restart: always
@@ -40,7 +40,7 @@ services:
     ports:
       - "16543:80"
     depends_on:
-      - db
+      - dokku-postgres-django4-rest-api
     restart: always
   # redis:
   #   container_name: redis
@@ -70,7 +70,7 @@ services:
       - "8000:8000"
     restart: always
     depends_on:
-      - db
+      - dokku-postgres-django4-rest-api
       # - redis
       # - elasticsearch
 
@@ -96,11 +96,11 @@ volumes:
 # docker-compose -f production.yml up -d
 # docker-compose run web /usr/local/bin/python manage.py migrate
 # docker-compose run web /usr/local/bin/python manage.py makemigrations
-# docker-compose run web python manage.py createsuperuser
+# docker compose run web python manage.py createsuperuser
 # sudo chmod 666 /var/run/docker.sock
 # docker-compose run web python manage.py collectstatic
 # docker-compose run web python manage.py startapp kinhdich
 # sudo chmod -R 777 admin
 # sudo chown -R baothi:baothi category
 # docker exec postgres pg_restore -U postgres -d phongthuy_thanhnhan phongthuy_thanhnhan.sql
-# hello
+# postgres://postgres:c3d315e1da12cea4636812b060f135dc@dokku-postgres-django4-rest-api:5432/django4_rest_api

@@ -12,8 +12,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 # https://github.com/encode/django-rest-framework/blob/master/rest_framework/serializers.py
 class WatchListSerializer(serializers.ModelSerializer):
-    reviews = ReviewSerializer(many=True, read_only=True)
-    # platform = serializers.CharField(source='platform.name')
+    # reviews = ReviewSerializer(many=True, read_only=True)
+    platform = serializers.CharField(source='platform.name')
     class Meta:
         model = WatchList
         fields = "__all__"
