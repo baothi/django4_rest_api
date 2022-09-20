@@ -25,6 +25,7 @@ COPY . /code/
 
 # Collect static files
 RUN python manage.py collectstatic --noinput --clear
+RUN chmod -R 777 /code/static/
 RUN chmod -R 777 /code/staticfiles/
 
 RUN chown -R django:django /code
