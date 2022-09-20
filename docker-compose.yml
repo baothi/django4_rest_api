@@ -1,0 +1,106 @@
+version: '3'
+services:
+  # elasticsearch:
+  #   container_name: elasticsearch
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+  #   restart: always
+  #   ports:
+  #     - "9200:9200"
+  #     # - "9300:9300"
+  #   environment:
+  #     discovery.type: single-node
+  #   volumes:
+  #     - elasticsearch:/usr/share/elasticsearch/data
+  #   environment:
+  #     ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #     discovery.type: single-node
+  #     network.host: "0.0.0.0"
+  #     bootstrap.memory_lock: "true"
+  dokku-postgres-django4-rest-api:
+    container_name: postgres
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: django4_rest_api
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: c3d315e1da12cea4636812b060f135dc
+      POSTGRES_PORT: 5432
+      DATABASE_HOST: 127.0.0.1
+    restart: always
+
+  pgadmin-compose:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "test@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "test123!"
+    ports:
+      - "16543:80"
+    depends_on:
+      - dokku-postgres-django4-rest-api
+    restart: always
+  # redis:
+  #   container_name: redis
+  #   image: redis:6.0.9-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redisdata:/data
+  web:
+    container_name: django4_rest_api
+    environment:
+      - DATABASE_URL=postgres://db/django4_rest_api
+      - SITE_URL=http://localhost:8000
+      # - REDIS_URL=redis://redis:6379/1
+      # - ELASTICSEARCH_URL=http://elasticsearch:9200
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python /code/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+      # - .:/code/static
+    working_dir: /code
+    environment:
+      DEBUG: 'true'
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - dokku-postgres-django4-rest-api
+      # - redis
+      # - elasticsearch
+
+
+volumes:
+  # elasticsearch:
+  # web-django:
+  # web-static:
+  pgdata:
+  # redisdata:
+
+# docker exec -i postgres pg_restore -Fc -v -U postgres --dbname phongthuy_thanhnhan < phongthuy_thanhnhan.sql
+# docker exec -i 36f1963068f2 psql -U postgres -d phongthuy_thanhnhan < phongthuy_thanhnhan.sql
+# docker-compose run postgres pg_dump -h postgres -U postgres ecommerce_shopping > ecommerce_shopping.dump
+
+# docker exec -t postgres /usr/bin/pg_dump -U postgres phongthuy_thanhnhan | gzip -9 > phongthuy_thanhnhan.sql.gz  (run for window)
+# docker exec tools_postgres_1 bash -c "pg_dump --username=postgres --no-password --format=t ecommerce_shopping | gzip > backup_local_$(date +%Y-%m-%d).tar.gz"
+# docker exec -i supply_web_1 rails c
+# docker-compose run --rm web
+# docker system prune -a
+# docker-compose build
+# python manage.py collectstatic
+# docker-compose -f production.yml up -d
+# docker-compose run web /usr/local/bin/python manage.py migrate
+# docker-compose run web /usr/local/bin/python manage.py makemigrations
+# docker compose run web python manage.py createsuperuser
+# sudo chmod 666 /var/run/docker.sock
+# docker-compose run web python manage.py collectstatic
+# docker-compose run web python manage.py startapp kinhdich
+# sudo chmod -R 777 admin
+# sudo chown -R baothi:baothi category
+# docker exec postgres pg_restore -U postgres -d phongthuy_thanhnhan phongthuy_thanhnhan.sql
+# postgres://postgres:c3d315e1da12cea4636812b060f135dc@dokku-postgres-django4-rest-api:5432/django4_rest_api

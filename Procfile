@@ -1,0 +1,1 @@
+web: gunicorn django4_rest_api.wsgi:application
