@@ -1,4 +1,3 @@
- Reference Reading Links (Arranged According To Lectures)
 You can visit the website here: https://django-rest-framework-example.site/
 
 🎥 Understanding REST API
